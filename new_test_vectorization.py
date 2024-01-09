@@ -443,7 +443,7 @@ def main(model_name, test_image_name, sampling_num):
     # set numpy output to something sensible
     np.set_printoptions(precision=8, edgeitems=6, linewidth=200, suppress=True)
 
-    for root, dirs, files in os.walk("atd12k_points/test_2k_540p"):
+    for root, dirs, files in os.walk("/home/curry/jshe2377/atd12k_points/test_2k_540p"):
         for file in files:
             if file == '.DS_Store':
                 continue
