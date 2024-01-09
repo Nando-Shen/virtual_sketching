@@ -154,7 +154,7 @@ def get_colors(color_num):
 def save_seq_data(seq_save_root, save_filename, strokes_data, init_cursors, image_size, round_length, init_width):
     # seq_save_root = os.path.join(save_root, 'seq_data')
     # os.makedirs(seq_save_root, exist_ok=True)
-    save_npz_path = os.path.join(seq_save_root, save_filename + '.npz')
+    save_npz_path = os.path.join(seq_save_root, save_filename.replace('.jpg','.npz'))
     print(save_npz_path)
     # np.savez(save_npz_path, strokes_data=strokes_data, init_cursors=init_cursors,
     #          image_size=image_size, round_length=round_length, init_width=init_width)
@@ -283,7 +283,7 @@ def draw_strokes(data, save_root, save_filename, input_img, image_size, init_cur
     canvas = np.round((1.0 - canvas) * 255.0).astype(np.uint8)  # [0-stroke, 255-BG]
 
     os.makedirs(save_root, exist_ok=True)
-    save_path = os.path.join(save_root, save_filename)
+    save_path = os.path.join(save_root, save_filename.replace('.jpg',''))
     print(save_path)
     # canvas_img = Image.fromarray(canvas, 'L')
     # canvas_img.save(save_path, 'PNG')

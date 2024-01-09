@@ -327,8 +327,8 @@ def main_testing(test_image_base_dir, test_dataset, test_image_raw_name,
     # loads the weights from checkpoint into our model
     snapshot_step = load_checkpoint(sess, model_dir, gen_model_pretrain=True)
     print('snapshot_step', snapshot_step)
-    sampling_dir = os.path.join(sampling_base_dir, test_dataset + '__' + model_name)
-    os.makedirs(sampling_dir, exist_ok=True)
+    sampling_dir = sampling_base_dir
+    # os.makedirs(sampling_dir, exist_ok=True)
 
     stroke_number_list = []
     compute_time_list = []
