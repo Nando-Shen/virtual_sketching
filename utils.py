@@ -239,7 +239,7 @@ def draw_strokes(data, save_root, save_filename, input_img, image_size, init_cur
 
             f = stroke_params_proc.tolist()  # (8)
             f += [1.0, 1.0]
-            print("----------------------  "+f)
+            print(f)
             gt_stroke_img = draw(f)  # (raster_size, raster_size), [0.0-stroke, 1.0-BG]
             gt_stroke_img_large = image_pasting_v3_testing(1.0 - gt_stroke_img, cursor_pos, image_size,
                                                             curr_window_size,
