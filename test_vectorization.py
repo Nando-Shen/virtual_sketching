@@ -438,7 +438,7 @@ def main(model_name, test_image_name, sampling_num):
     stroke_acc_threshold = 0.95
 
     draw_seq = False
-    draw_color_order = True
+    draw_color_order = False
 
     # set numpy output to something sensible
     np.set_printoptions(precision=8, edgeitems=6, linewidth=200, suppress=True)
