@@ -90,6 +90,7 @@ def draw(f, width=128):
     x0, y0, x1, y1, x2, y2, z0, z2, w0, w2 = f
     x1 = x0 + (x2 - x0) * x1
     y1 = y0 + (y2 - y0) * y1
+    cv2.line(canvas, (x0,y0), (x2,y2), (255,255,255), z0)
     x0 = normal(x0, width * 2)
     x1 = normal(x1, width * 2)
     x2 = normal(x2, width * 2)
@@ -109,7 +110,7 @@ def draw(f, width=128):
     #     # if (i == 1 or i == 99):
     #     #     print('-------------x{} y{} ---------'.format(x,y))
     #     cv2.circle(canvas, (y, x), z, w, -1)
-    cv2.line(canvas, (x1,y1), (x2,y2), (255,255,255), z0)
+    # cv2.line(canvas, (x0,y0), (x2,y2), (255,255,255), z0)
 
     return 1 - cv2.resize(canvas, dsize=(width, width))
 
