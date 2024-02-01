@@ -118,7 +118,6 @@ def draw(f, width=128):
         # pair = curlist[i], curlist[i + 1]
         cv2.line(canvas, curlist[i], curlist[i + 1], (255, 255, 255), z0)
 
-
     return 1 - cv2.resize(canvas, dsize=(width, width))
 
 def create_connection_json(lines):
