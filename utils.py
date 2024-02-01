@@ -101,7 +101,7 @@ def draw(f, width=128):
     canvas = np.zeros([width * 2, width * 2]).astype('float32')
     tmp = 1. / 100
     curlist = []
-    for i in range(0, 100, 50):
+    for i in range(0, 100, 49):
         print(i)
         t = i * tmp
         x = (int)((1-t) * (1-t) * x0 + 2 * t * (1-t) * x1 + t * t * x2)
