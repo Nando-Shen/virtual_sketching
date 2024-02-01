@@ -112,7 +112,7 @@ def draw(f, width=128):
         # if (i == 1 or i == 99):
         #     print('-------------x{} y{} ---------'.format(x,y))
         # cv2.circle(canvas, (y, x), z, w, -1)
-        curlist.append((x,y))
+        curlist.append((y,x))
     # cv2.line(canvas, (x0,y0), (x2,y2), (255,255,255), z0)
     for i in range(len(curlist) - 1):
         # pair = curlist[i], curlist[i + 1]
