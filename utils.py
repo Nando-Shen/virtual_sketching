@@ -5,6 +5,7 @@ import numpy as np
 import tensorflow as tf
 from PIL import Image
 import matplotlib.pyplot as plt
+from collections import defaultdict
 
 
 #############################################
@@ -111,14 +112,54 @@ def draw(f, width=128):
         # if (i == 1 or i == 99):
         #     print('-------------x{} y{} ---------'.format(x,y))
         # cv2.circle(canvas, (y, x), z, w, -1)
-        curlist.append((y,x))
+        curlist.append((x,y))
     # cv2.line(canvas, (x0,y0), (x2,y2), (255,255,255), z0)
     for i in range(len(curlist) - 1):
         # pair = curlist[i], curlist[i + 1]
         cv2.line(canvas, curlist[i], curlist[i + 1], (255, 255, 255), z0)
 
+
     return 1 - cv2.resize(canvas, dsize=(width, width))
 
+def create_connection_json(lines):
+    # 用于存储坐标点及其索引的字典
+    points_dict = {}
+    # 用于存储点之间的连接关系
+    connections = defaultdict(list)
+    # 用于记录当前索引值
+    point_index = 0
+
+    # 遍历所有线条
+    for line in lines:
+        # 对于线条中的每个点
+        for point in line:
+            # 如果点不在字典中，添加它
+            if point not in points_dict:
+                points_dict[point] = point_index
+                point_index += 1
+
+        # 获取线条中点的索引
+        start_index = points_dict[line[0]]
+        mid_index = points_dict[line[1]]
+        end_index = points_dict[line[2]]
+
+        # 添加连接关系
+        # 起点与中点相连
+        connections[start_index].append(mid_index)
+        # 中点与终点相连
+        connections[mid_index].append(end_index)
+
+    # 对于每个点，去除重复的连接并排序
+    for point in connections:
+        connections[point] = sorted(set(connections[point]))
+
+    # 准备JSON格式的数据
+    json_data = {
+        "xy": list(points_dict.keys()),
+        "connection": [[k] + v for k, v in connections.items()]
+    }
+
+    return json_data
 
 def rgb_trans(split_num, break_values):
     slice_per_split = split_num // 8
