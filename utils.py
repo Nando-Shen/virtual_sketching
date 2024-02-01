@@ -102,6 +102,7 @@ def draw(f, width=128):
     tmp = 1. / 100
     curlist = []
     for i in range(0, 100, 50):
+        print(i)
         t = i * tmp
         x = (int)((1-t) * (1-t) * x0 + 2 * t * (1-t) * x1 + t * t * x2)
         y = (int)((1-t) * (1-t) * y0 + 2 * t * (1-t) * y1 + t * t * y2)
