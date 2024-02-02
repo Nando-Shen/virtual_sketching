@@ -117,7 +117,7 @@ def draw(f, width=128):
         #     print('-------------x{} y{} ---------'.format(x,y))
         # cv2.circle(canvas, (y, x), z, w, -1)
         # curlist.append((y,x))
-    cv2.line(canvas, (y0,x0), (y2,x2), (255,255,255), z0)
+    cv2.line(canvas, (y0,x0), (y2,x2), (0,0,0), z0)
     # for i in range(len(curlist) - 1):
         # pair = curlist[i], curlist[i + 1]
         # cv2.line(canvas, curlist[i], curlist[i + 1], (255, 255, 255), z0)
@@ -136,7 +136,7 @@ def getline(f, width=128):
     y2 = normal(y2, width * 2)
     z0 = (int)(1 + z0 * width // 2)
     z2 = (int)(1 + z2 * width // 2)
-    canvas = np.zeros([width * 2, width * 2]).astype('float32')
+    # canvas = np.zeros([width * 2, width * 2]).astype('float32')
     # tmp = 1. / 100
     # curlist = []
     # for i in range(0, 100, 49):
@@ -150,7 +150,7 @@ def getline(f, width=128):
         #     print('-------------x{} y{} ---------'.format(x,y))
         # cv2.circle(canvas, (y, x), z, w, -1)
         # curlist.append((y,x))
-    cv2.line(canvas, (y0,x0), (y2,x2), (0,0,0), z0)
+    # cv2.line(canvas, (y0,x0), (y2,x2), (255,255,255), z0)
     # for i in range(len(curlist) - 1):
         # pair = curlist[i], curlist[i + 1]
         # cv2.line(canvas, curlist[i], curlist[i + 1], (255, 255, 255), z0)
@@ -319,21 +319,21 @@ def draw_strokes(data, save_root, save_filename, input_img, image_size, init_cur
             f = stroke_params_proc.tolist()  # (8)
             f += [1.0, 1.0]
             # print(f)
-            # gt_stroke_img = draw(f)  # (raster_size, raster_size), [0.0-stroke, 1.0-BG]
+            gt_stroke_img = draw(f)  # (raster_size, raster_size), [0.0-stroke, 1.0-BG]
 
             line = getline(f)
 
 
-            # gt_stroke_img_large = image_pasting_v3_testing(1.0 - gt_stroke_img, cursor_pos, image_size,
-            #                                                 curr_window_size,
-            #                                                 pasting_func, sess)  # [0.0-BG, 1.0-stroke]
+            gt_stroke_img_large = image_pasting_v3_testing(1.0 - gt_stroke_img, cursor_pos, image_size,
+                                                            curr_window_size,
+                                                            pasting_func, sess)  # [0.0-BG, 1.0-stroke]
             if pen_state == 1:
                 print(line)
                 lines.append(line)
 
-            # if pen_state == 0:
-            #     canvas += gt_stroke_img_large  # [0.0-BG, 1.0-stroke]
-            #
+            if pen_state == 0:
+                canvas += gt_stroke_img_large  # [0.0-BG, 1.0-stroke]
+
             # if draw_order:
             #     color_rgb = color_rgb_set[color_idx]  # (3) in [0, 255]
             #     color_idx += 1
@@ -369,8 +369,8 @@ def draw_strokes(data, save_root, save_filename, input_img, image_size, init_cur
 
             frames.append(canvas.copy())
 
-    # canvas = np.clip(canvas, 0.0, 1.0)
-    # canvas = np.round((1.0 - canvas) * 255.0).astype(np.uint8)  # [0-stroke, 255-BG]
+    canvas = np.clip(canvas, 0.0, 1.0)
+    canvas = np.round((1.0 - canvas) * 255.0).astype(np.uint8)  # [0-stroke, 255-BG]
 
     os.makedirs(save_root, exist_ok=True)
 
@@ -378,10 +378,10 @@ def draw_strokes(data, save_root, save_filename, input_img, image_size, init_cur
     json_save_path = os.path.join(save_root, 'output.json')
     save_to_json(json_content, json_save_path)
 
-    # save_path = os.path.join(save_root, save_filename.replace('.jpg',''))
-    # print(save_path)
-    # canvas_img = Image.fromarray(canvas, 'L')
-    # canvas_img.save(save_path, 'PNG')
+    save_path = os.path.join(save_root, save_filename.replace('.jpg',''))
+    print(save_path)
+    canvas_img = Image.fromarray(canvas, 'L')
+    canvas_img.save(save_path, 'PNG')
 
     if save_seq:
         seq_save_root = os.path.join(save_root, 'seq', save_filename[:-4])
