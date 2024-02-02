@@ -327,7 +327,7 @@ def draw_strokes(data, save_root, save_filename, input_img, image_size, init_cur
             # gt_stroke_img_large = image_pasting_v3_testing(1.0 - gt_stroke_img, cursor_pos, image_size,
             #                                                 curr_window_size,
             #                                                 pasting_func, sess)  # [0.0-BG, 1.0-stroke]
-            if pen_state == 0:
+            if pen_state == 1:
                 print(line)
                 lines.append(line)
 
