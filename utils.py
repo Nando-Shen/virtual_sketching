@@ -322,13 +322,13 @@ def draw_strokes(data, save_root, save_filename, input_img, image_size, init_cur
             # gt_stroke_img = draw(f)  # (raster_size, raster_size), [0.0-stroke, 1.0-BG]
 
             line = getline(f)
-            lines.append(line)
+
 
             # gt_stroke_img_large = image_pasting_v3_testing(1.0 - gt_stroke_img, cursor_pos, image_size,
             #                                                 curr_window_size,
             #                                                 pasting_func, sess)  # [0.0-BG, 1.0-stroke]
-            if pen_state == 1:
-                print(line)
+            if pen_state == 0:
+                lines.append(line)
 
             # if pen_state == 0:
             #     canvas += gt_stroke_img_large  # [0.0-BG, 1.0-stroke]
