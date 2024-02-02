@@ -136,7 +136,7 @@ def getline(f, width=128):
     y2 = normal(y2, width * 2)
     z0 = (int)(1 + z0 * width // 2)
     z2 = (int)(1 + z2 * width // 2)
-    # canvas = np.zeros([width * 2, width * 2]).astype('float32')
+    canvas = np.zeros([width * 2, width * 2]).astype('float32')
     # tmp = 1. / 100
     # curlist = []
     # for i in range(0, 100, 49):
@@ -150,7 +150,7 @@ def getline(f, width=128):
         #     print('-------------x{} y{} ---------'.format(x,y))
         # cv2.circle(canvas, (y, x), z, w, -1)
         # curlist.append((y,x))
-    # cv2.line(canvas, (y0,x0), (y2,x2), (255,255,255), z0)
+    cv2.line(canvas, (y0,x0), (y2,x2), (0,0,0), z0)
     # for i in range(len(curlist) - 1):
         # pair = curlist[i], curlist[i + 1]
         # cv2.line(canvas, curlist[i], curlist[i + 1], (255, 255, 255), z0)
