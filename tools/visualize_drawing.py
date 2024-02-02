@@ -4,12 +4,18 @@ import argparse
 import numpy as np
 from PIL import Image
 import tensorflow as tf
+import json
 
 sys.path.append('./')
-from utils import get_colors, draw, image_pasting_v3_testing
+from utils import get_colors, draw, image_pasting_v3_testing, getline, create_connection_json
 from model_common_test import DiffPastingV3
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+
+
+def save_to_json(data, filename):
+    with open(filename, 'w') as json_file:
+        json.dump(data, json_file, indent=4, default=lambda x: x.tolist() if isinstance(x, np.ndarray) else int(x))
 
 
 def display_strokes_final(sess, pasting_func, data, init_cursor, image_size, infer_lengths, init_width,
@@ -41,7 +47,7 @@ def display_strokes_final(sess, pasting_func, data, init_cursor, image_size, inf
 
     # print('Drawn stroke number', valid_stroke_count)
     # print('    flag  x1\t\t y1\t\t x2\t\t y2\t\t r2\t\t s2')
-
+    lines = []
     for round_idx in range(len(infer_lengths)):
         round_length = infer_lengths[round_idx]
 
@@ -81,51 +87,53 @@ def display_strokes_final(sess, pasting_func, data, init_cursor, image_size, inf
 
             f = stroke_params_proc.tolist()  # (8)
             f += [1.0, 1.0]
-            gt_stroke_img = draw(f)  # (H, W), [0.0-stroke, 1.0-BG]
+            # gt_stroke_img = draw(f)  # (H, W), [0.0-stroke, 1.0-BG]
+            line = getline(f)
+            lines.append(line)
 
-            gt_stroke_img_large = image_pasting_v3_testing(1.0 - gt_stroke_img, cursor_pos,
-                                                           image_size,
-                                                           curr_window_size_raw,
-                                                           pasting_func, sess)  # [0.0-BG, 1.0-stroke]
-
-            is_overlap = False
-
-            if pen_state == 0:
-                canvas += gt_stroke_img_large  # [0.0-BG, 1.0-stroke]
-
-                curr_drawn_stroke_region = np.zeros_like(gt_stroke_img_large)
-                curr_drawn_stroke_region[gt_stroke_img_large > 0.5] = 1
-                intersection = drawn_region * curr_drawn_stroke_region
-                # regard stroke with >50% overlap area as overlaped stroke
-                if np.sum(intersection) / np.sum(curr_drawn_stroke_region) > 0.5:
-                    # enlarge the stroke a bit for better visualization
-                    overlap_region[gt_stroke_img_large > 0] += 1
-                    is_overlap = True
-
-                drawn_region[gt_stroke_img_large > 0.5] = 1
-
-            color_rgb = color_rgb_set[color_idx]  # (3) in [0, 255]
-            color_idx += 1
-
-            color_rgb = np.reshape(color_rgb, (1, 1, 3)).astype(np.float32)
-            color_stroke = np.expand_dims(gt_stroke_img_large, axis=-1) * (1.0 - color_rgb / 255.0)
-            canvas_color_with_moving = canvas_color_with_moving * np.expand_dims((1.0 - gt_stroke_img_large),
-                                                                                 axis=-1) + color_stroke  # (H, W, 3)
-
-            if pen_state == 0:
-                valid_color_idx += 1
-
-            if pen_state == 0:
-                valid_color_rgb = valid_color_rgb_set[valid_color_idx]  # (3) in [0, 255]
-                # valid_color_idx += 1
-
-                valid_color_rgb = np.reshape(valid_color_rgb, (1, 1, 3)).astype(np.float32)
-                valid_color_stroke = np.expand_dims(gt_stroke_img_large, axis=-1) * (1.0 - valid_color_rgb / 255.0)
-                canvas_color_with_overlap = canvas_color_with_overlap * np.expand_dims((1.0 - gt_stroke_img_large),
-                                                                                       axis=-1) + valid_color_stroke  # (H, W, 3)
-                if not is_overlap:
-                    canvas_color_wo_overlap = canvas_color_wo_overlap * np.expand_dims((1.0 - gt_stroke_img_large),
-                                                                                       axis=-1) + valid_color_stroke  # (H, W, 3)
+            # gt_stroke_img_large = image_pasting_v3_testing(1.0 - gt_stroke_img, cursor_pos,
+            #                                                image_size,
+            #                                                curr_window_size_raw,
+            #                                                pasting_func, sess)  # [0.0-BG, 1.0-stroke]
+            #
+            # is_overlap = False
+            #
+            # if pen_state == 0:
+            #     canvas += gt_stroke_img_large  # [0.0-BG, 1.0-stroke]
+            #
+            #     curr_drawn_stroke_region = np.zeros_like(gt_stroke_img_large)
+            #     curr_drawn_stroke_region[gt_stroke_img_large > 0.5] = 1
+            #     intersection = drawn_region * curr_drawn_stroke_region
+            #     # regard stroke with >50% overlap area as overlaped stroke
+            #     if np.sum(intersection) / np.sum(curr_drawn_stroke_region) > 0.5:
+            #         # enlarge the stroke a bit for better visualization
+            #         overlap_region[gt_stroke_img_large > 0] += 1
+            #         is_overlap = True
+            #
+            #     drawn_region[gt_stroke_img_large > 0.5] = 1
+            #
+            # color_rgb = color_rgb_set[color_idx]  # (3) in [0, 255]
+            # color_idx += 1
+            #
+            # color_rgb = np.reshape(color_rgb, (1, 1, 3)).astype(np.float32)
+            # color_stroke = np.expand_dims(gt_stroke_img_large, axis=-1) * (1.0 - color_rgb / 255.0)
+            # canvas_color_with_moving = canvas_color_with_moving * np.expand_dims((1.0 - gt_stroke_img_large),
+            #                                                                      axis=-1) + color_stroke  # (H, W, 3)
+            #
+            # if pen_state == 0:
+            #     valid_color_idx += 1
+            #
+            # if pen_state == 0:
+            #     valid_color_rgb = valid_color_rgb_set[valid_color_idx]  # (3) in [0, 255]
+            #     # valid_color_idx += 1
+            #
+            #     valid_color_rgb = np.reshape(valid_color_rgb, (1, 1, 3)).astype(np.float32)
+            #     valid_color_stroke = np.expand_dims(gt_stroke_img_large, axis=-1) * (1.0 - valid_color_rgb / 255.0)
+            #     canvas_color_with_overlap = canvas_color_with_overlap * np.expand_dims((1.0 - gt_stroke_img_large),
+            #                                                                            axis=-1) + valid_color_stroke  # (H, W, 3)
+            #     if not is_overlap:
+            #         canvas_color_wo_overlap = canvas_color_wo_overlap * np.expand_dims((1.0 - gt_stroke_img_large),
+            #                                                                            axis=-1) + valid_color_stroke  # (H, W, 3)
 
             # update cursor_pos based on hps.cursor_type
             new_cursor_offsets = stroke_params[2:4] * (float(curr_window_size_raw) / 2.0)  # (1, 6), patch-level
@@ -146,27 +154,31 @@ def display_strokes_final(sess, pasting_func, data, init_cursor, image_size, inf
             cursor_pos_large = np.minimum(np.maximum(cursor_pos_large, 0.0), float(image_size - 1))  # (2), large-level
             cursor_pos = cursor_pos_large / float(image_size)
 
-    canvas_rgb = np.stack([np.clip(canvas, 0.0, 1.0) for _ in range(3)], axis=-1)
-    canvas_black = 255 - np.round(canvas_rgb * 255.0).astype(np.uint8)
-    canvas_color_with_overlap = 255 - np.round(canvas_color_with_overlap * 255.0).astype(np.uint8)
-    canvas_color_wo_overlap = 255 - np.round(canvas_color_wo_overlap * 255.0).astype(np.uint8)
-    canvas_color_with_moving = 255 - np.round(canvas_color_with_moving * 255.0).astype(np.uint8)
+    json_content = create_connection_json(lines)
+    json_save_path = os.path.join(save_base, 'output.json')
+    save_to_json(json_content, json_save_path)
 
-    canvas_black_png = Image.fromarray(canvas_black, 'RGB')
-    canvas_black_save_path = os.path.join(save_base, 'output_rendered.png')
-    canvas_black_png.save(canvas_black_save_path, 'PNG')
-
-    canvas_color_png = Image.fromarray(canvas_color_with_overlap, 'RGB')
-    canvas_color_save_path = os.path.join(save_base, 'output_order_with_overlap.png')
-    canvas_color_png.save(canvas_color_save_path, 'PNG')
-
-    canvas_color_wo_png = Image.fromarray(canvas_color_wo_overlap, 'RGB')
-    canvas_color_wo_save_path = os.path.join(save_base, 'output_order_wo_overlap.png')
-    canvas_color_wo_png.save(canvas_color_wo_save_path, 'PNG')
-
-    canvas_color_m_png = Image.fromarray(canvas_color_with_moving, 'RGB')
-    canvas_color_m_save_path = os.path.join(save_base, 'output_order_with_moving.png')
-    canvas_color_m_png.save(canvas_color_m_save_path, 'PNG')
+    # canvas_rgb = np.stack([np.clip(canvas, 0.0, 1.0) for _ in range(3)], axis=-1)
+    # canvas_black = 255 - np.round(canvas_rgb * 255.0).astype(np.uint8)
+    # canvas_color_with_overlap = 255 - np.round(canvas_color_with_overlap * 255.0).astype(np.uint8)
+    # canvas_color_wo_overlap = 255 - np.round(canvas_color_wo_overlap * 255.0).astype(np.uint8)
+    # canvas_color_with_moving = 255 - np.round(canvas_color_with_moving * 255.0).astype(np.uint8)
+    #
+    # canvas_black_png = Image.fromarray(canvas_black, 'RGB')
+    # canvas_black_save_path = os.path.join(save_base, 'output_rendered.png')
+    # canvas_black_png.save(canvas_black_save_path, 'PNG')
+    #
+    # canvas_color_png = Image.fromarray(canvas_color_with_overlap, 'RGB')
+    # canvas_color_save_path = os.path.join(save_base, 'output_order_with_overlap.png')
+    # canvas_color_png.save(canvas_color_save_path, 'PNG')
+    #
+    # canvas_color_wo_png = Image.fromarray(canvas_color_wo_overlap, 'RGB')
+    # canvas_color_wo_save_path = os.path.join(save_base, 'output_order_wo_overlap.png')
+    # canvas_color_wo_png.save(canvas_color_wo_save_path, 'PNG')
+    #
+    # canvas_color_m_png = Image.fromarray(canvas_color_with_moving, 'RGB')
+    # canvas_color_m_save_path = os.path.join(save_base, 'output_order_with_moving.png')
+    # canvas_color_m_png.save(canvas_color_m_save_path, 'PNG')
 
 
 def visualize_drawing(npz_path):

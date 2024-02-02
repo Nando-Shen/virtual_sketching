@@ -100,8 +100,8 @@ def draw(f, width=128):
     z0 = (int)(1 + z0 * width // 2)
     z2 = (int)(1 + z2 * width // 2)
     canvas = np.zeros([width * 2, width * 2]).astype('float32')
-    tmp = 1. / 100
-    curlist = []
+    # tmp = 1. / 100
+    # curlist = []
     # for i in range(0, 100, 49):
         # print(i)
         # t = i * tmp
@@ -120,45 +120,69 @@ def draw(f, width=128):
 
     return 1 - cv2.resize(canvas, dsize=(width, width))
 
+def getline(f, width=128):
+    x0, y0, x1, y1, x2, y2, z0, z2, w0, w2 = f
+    x1 = x0 + (x2 - x0) * x1
+    y1 = y0 + (y2 - y0) * y1
+    x0 = normal(x0, width * 2)
+    x1 = normal(x1, width * 2)
+    x2 = normal(x2, width * 2)
+    y0 = normal(y0, width * 2)
+    y1 = normal(y1, width * 2)
+    y2 = normal(y2, width * 2)
+    z0 = (int)(1 + z0 * width // 2)
+    z2 = (int)(1 + z2 * width // 2)
+    canvas = np.zeros([width * 2, width * 2]).astype('float32')
+    # tmp = 1. / 100
+    # curlist = []
+    # for i in range(0, 100, 49):
+        # print(i)
+        # t = i * tmp
+        # x = (int)((1-t) * (1-t) * x0 + 2 * t * (1-t) * x1 + t * t * x2)
+        # y = (int)((1-t) * (1-t) * y0 + 2 * t * (1-t) * y1 + t * t * y2)
+        # z = (int)((1-t) * z0 + t * z2)
+        # w = (1-t) * w0 + t * w2
+        # if (i == 1 or i == 99):
+        #     print('-------------x{} y{} ---------'.format(x,y))
+        # cv2.circle(canvas, (y, x), z, w, -1)
+        # curlist.append((y,x))
+    # cv2.line(canvas, (y0,x0), (y2,x2), (255,255,255), z0)
+    # for i in range(len(curlist) - 1):
+        # pair = curlist[i], curlist[i + 1]
+        # cv2.line(canvas, curlist[i], curlist[i + 1], (255, 255, 255), z0)
+
+    return [(y0,x0), (y2,x2)]
+
 def create_connection_json(lines):
-    # 用于存储坐标点及其索引的字典
-    points_dict = {}
-    # 用于存储点之间的连接关系
-    connections = defaultdict(list)
-    # 用于记录当前索引值
-    point_index = 0
+    points_dict = {}  # 存储坐标点及其索引的字典
+    connections = defaultdict(list)  # 存储点之间的连接关系
+    point_index = 0  # 记录当前索引值
 
     # 遍历所有线条
     for line in lines:
-        # 对于线条中的每个点
+        line_indices = []  # 存储当前线条中点的索引
         for point in line:
-            # 如果点不在字典中，添加它
             if point not in points_dict:
                 points_dict[point] = point_index
                 point_index += 1
+            line_indices.append(points_dict[point])
 
-        # 获取线条中点的索引
-        start_index = points_dict[line[0]]
-        mid_index = points_dict[line[1]]
-        end_index = points_dict[line[2]]
+        # 线条的起点和终点相连
+        start_index, end_index = line_indices
+        connections[start_index].append(end_index)
+        connections[end_index].append(start_index)
 
-        # 添加连接关系
-        # 起点与中点相连
-        connections[start_index].append(mid_index)
-        # 中点与终点相连
-        connections[mid_index].append(end_index)
-
-    # 对于每个点，去除重复的连接并排序
+    # 去除重复的连接并排序
     for point in connections:
         connections[point] = sorted(set(connections[point]))
 
-    # 准备JSON格式的数据
     json_data = {
         "xy": list(points_dict.keys()),
         "connection": [[k] + v for k, v in connections.items()]
     }
 
     return json_data
+
 
 def rgb_trans(split_num, break_values):
     slice_per_split = split_num // 8
