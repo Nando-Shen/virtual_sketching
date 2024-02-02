@@ -296,7 +296,7 @@ def draw_strokes(data, save_root, save_filename, input_img, image_size, init_cur
             curr_window_size = np.minimum(curr_window_size, image_size)
 
             pen_state = data[stroke_idx, 0]
-            print(pen_state)
+            # print(pen_state)
             stroke_params = data[stroke_idx, 1:]  # (8)
 
             x1y1, x2y2, width2, scaling2 = stroke_params[0:2], stroke_params[2:4], stroke_params[4], stroke_params[5]
@@ -328,6 +328,7 @@ def draw_strokes(data, save_root, save_filename, input_img, image_size, init_cur
             #                                                 curr_window_size,
             #                                                 pasting_func, sess)  # [0.0-BG, 1.0-stroke]
             if pen_state == 0:
+                print(line)
                 lines.append(line)
 
             # if pen_state == 0:
