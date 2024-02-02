@@ -155,6 +155,7 @@ def display_strokes_final(sess, pasting_func, data, init_cursor, image_size, inf
             cursor_pos = cursor_pos_large / float(image_size)
 
     json_content = create_connection_json(lines)
+    print(save_base)
     json_save_path = os.path.join(save_base, 'output.json')
     save_to_json(json_content, json_save_path)
 
