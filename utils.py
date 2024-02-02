@@ -379,7 +379,7 @@ def draw_strokes(data, save_root, save_filename, input_img, image_size, init_cur
     save_to_json(json_content, json_save_path)
 
     save_path = os.path.join(save_root, save_filename.replace('.jpg',''))
-    print(save_path)
+    # print(save_path)
     canvas_img = Image.fromarray(canvas, 'L')
     canvas_img.save(save_path, 'PNG')
 
