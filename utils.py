@@ -12,6 +12,10 @@ from collections import defaultdict
 # Tensorflow utils
 #############################################
 
+def save_to_json(data, filename):
+    with open(filename, 'w') as json_file:
+        json.dump(data, json_file, indent=4, default=lambda x: x.tolist() if isinstance(x, np.ndarray) else int(x))
+
 def reset_graph():
     """Closes the current default session and resets the graph."""
     sess = tf.get_default_session()
@@ -272,6 +276,8 @@ def draw_strokes(data, save_root, save_filename, input_img, image_size, init_cur
     color_rgb_set = get_colors(stroke_count)  # list of (3,) in [0, 255]
     color_idx = 0
 
+    lines = []
+
     for round_idx in range(len(infer_lengths)):
         round_length = infer_lengths[round_idx]
 
@@ -311,28 +317,32 @@ def draw_strokes(data, save_root, save_filename, input_img, image_size, init_cur
 
             f = stroke_params_proc.tolist()  # (8)
             f += [1.0, 1.0]
-            print(f)
-            gt_stroke_img = draw(f)  # (raster_size, raster_size), [0.0-stroke, 1.0-BG]
-            gt_stroke_img_large = image_pasting_v3_testing(1.0 - gt_stroke_img, cursor_pos, image_size,
-                                                            curr_window_size,
-                                                            pasting_func, sess)  # [0.0-BG, 1.0-stroke]
+            # print(f)
+            # gt_stroke_img = draw(f)  # (raster_size, raster_size), [0.0-stroke, 1.0-BG]
 
-            if pen_state == 0:
-                canvas += gt_stroke_img_large  # [0.0-BG, 1.0-stroke]
+            line = getline(f)
+            lines.append(line)
 
-            if draw_order:
-                color_rgb = color_rgb_set[color_idx]  # (3) in [0, 255]
-                color_idx += 1
+            # gt_stroke_img_large = image_pasting_v3_testing(1.0 - gt_stroke_img, cursor_pos, image_size,
+            #                                                 curr_window_size,
+            #                                                 pasting_func, sess)  # [0.0-BG, 1.0-stroke]
 
-                color_rgb = np.reshape(color_rgb, (1, 1, 3)).astype(np.float32)
-                color_stroke = np.expand_dims(gt_stroke_img_large, axis=-1) * (1.0 - color_rgb / 255.0)
-                canvas_color_with_moving = canvas_color_with_moving * np.expand_dims((1.0 - gt_stroke_img_large),
-                                                                                     axis=-1) + color_stroke  # (H, W, 3)
-
-                if pen_state == 0:
-                    canvas_color = canvas_color * np.expand_dims((1.0 - gt_stroke_img_large),
-                                                                 axis=-1) + color_stroke  # (H, W, 3)
-
+            # if pen_state == 0:
+            #     canvas += gt_stroke_img_large  # [0.0-BG, 1.0-stroke]
+            #
+            # if draw_order:
+            #     color_rgb = color_rgb_set[color_idx]  # (3) in [0, 255]
+            #     color_idx += 1
+            #
+            #     color_rgb = np.reshape(color_rgb, (1, 1, 3)).astype(np.float32)
+            #     color_stroke = np.expand_dims(gt_stroke_img_large, axis=-1) * (1.0 - color_rgb / 255.0)
+            #     canvas_color_with_moving = canvas_color_with_moving * np.expand_dims((1.0 - gt_stroke_img_large),
+            #                                                                          axis=-1) + color_stroke  # (H, W, 3)
+            #
+            #     if pen_state == 0:
+            #         canvas_color = canvas_color * np.expand_dims((1.0 - gt_stroke_img_large),
+            #                                                      axis=-1) + color_stroke  # (H, W, 3)
+            #
             # update cursor_pos based on hps.cursor_type
             new_cursor_offsets = stroke_params[2:4] * (curr_window_size / 2.0)  # (1, 6), patch-level
             new_cursor_offset_next = new_cursor_offsets
@@ -354,14 +364,19 @@ def draw_strokes(data, save_root, save_filename, input_img, image_size, init_cur
 
             frames.append(canvas.copy())
 
-    canvas = np.clip(canvas, 0.0, 1.0)
-    canvas = np.round((1.0 - canvas) * 255.0).astype(np.uint8)  # [0-stroke, 255-BG]
+    # canvas = np.clip(canvas, 0.0, 1.0)
+    # canvas = np.round((1.0 - canvas) * 255.0).astype(np.uint8)  # [0-stroke, 255-BG]
 
     os.makedirs(save_root, exist_ok=True)
-    save_path = os.path.join(save_root, save_filename.replace('.jpg',''))
+
+    json_content = create_connection_json(lines)
+    json_save_path = os.path.join(save_root, 'output.json')
+    save_to_json(json_content, json_save_path)
+
+    # save_path = os.path.join(save_root, save_filename.replace('.jpg',''))
     # print(save_path)
-    canvas_img = Image.fromarray(canvas, 'L')
-    canvas_img.save(save_path, 'PNG')
+    # canvas_img = Image.fromarray(canvas, 'L')
+    # canvas_img.save(save_path, 'PNG')
 
     if save_seq:
         seq_save_root = os.path.join(save_root, 'seq', save_filename[:-4])

@@ -13,11 +13,6 @@ from model_common_test import DiffPastingV3
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 
-def save_to_json(data, filename):
-    with open(filename, 'w') as json_file:
-        json.dump(data, json_file, indent=4, default=lambda x: x.tolist() if isinstance(x, np.ndarray) else int(x))
-
-
 def display_strokes_final(sess, pasting_func, data, init_cursor, image_size, infer_lengths, init_width,
                           save_base,
                           cursor_type='next', min_window_size=32, raster_size=128):
