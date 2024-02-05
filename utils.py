@@ -182,8 +182,8 @@ def create_connection_json(lines):
         connections[point] = sorted(set(connections[point]))
 
     json_data = {
-        "xy": list(points_dict.keys()),
-        "connection": [[k] + v for k, v in connections.items()]
+        "keypoints": list(points_dict.keys()),
+        "topo": [[k] + v for k, v in connections.items()]
     }
 
     return json_data
@@ -237,7 +237,7 @@ def save_seq_data(seq_save_root, save_filename, strokes_data, init_cursors, imag
     # print(save_npz_path)
     np.savez(save_npz_path, strokes_data=strokes_data, init_cursors=init_cursors,
              image_size=image_size, round_length=round_length, init_width=init_width)
-
+    return save_npz_path
 
 def image_pasting_v3_testing(patch_image, cursor, image_size, window_size_f, pasting_func, sess):
     """

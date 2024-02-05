@@ -2,7 +2,8 @@ import os
 import argparse
 import numpy as np
 from xml.dom import minidom
-
+from collections import defaultdict
+from utils import save_to_json, create_connection_json
 
 def write_svg_1(path_list, img_size, save_path):
     ''' A long curve consisting of several strokes forms a path. '''
@@ -71,6 +72,7 @@ def write_svg_2(path_list, img_size, save_path):
     rootElement.setAttribute('width', str(img_size))
 
     path_num = len(path_list)
+    lines = []
     for path_i in range(path_num):
         path_items = path_list[path_i]
 
@@ -91,7 +93,7 @@ def write_svg_2(path_list, img_size, save_path):
 
                 command_str = 'M ' + str(last_position[0]) + ', ' + str(last_position[1]) + ' '
                 command_str += 'Q '
-
+                x0y0 = (int(last_position[0]), int(last_position[1]))
                 ctrl_position, stroke_position, stroke_width = stroke_item[0], stroke_item[1], stroke_item[2]
 
                 ctrl_position_0 = last_position[0] + (stroke_position[0] - last_position[0]) * ctrl_position[1]
@@ -99,7 +101,8 @@ def write_svg_2(path_list, img_size, save_path):
 
                 command_str += str(ctrl_position_0) + ', ' + str(ctrl_position_1) + ', ' + \
                                str(stroke_position[0]) + ', ' + str(stroke_position[1]) + ' '
-
+                x1y1 = (int(stroke_position[0]), int(stroke_position[1]))
+                lines.append([x0y0, x1y1])
                 last_position = stroke_position
 
                 childElement.setAttribute('d', command_str)
@@ -107,6 +110,11 @@ def write_svg_2(path_list, img_size, save_path):
                 rootElement.appendChild(childElement)
 
     doc.appendChild(rootElement)
+    json_content = create_connection_json(lines)
+    json_path = save_path.replace('.svg', '.json')
+    # json_path = os.path.join(save_path, 'output.json')
+    save_to_json(json_content, json_path)
+    print(json_path)
 
     f = open(save_path, 'w')
     doc.writexml(f, addindent='  ', newl='\n')
@@ -210,7 +218,9 @@ def data_convert_to_absolute(npz_path, svg_type):
         file_base = npz_path[:npz_path.rfind('/')]
         file_name = npz_path[npz_path.rfind('/') + 1: -4]
 
-    svg_data_base = os.path.join(file_base, file_name)
+    svg_data_base = file_base
+    # svg_data_base = os.path.join(file_base, file_name)
+    print(svg_data_base)
     os.makedirs(svg_data_base, exist_ok=True)
 
     data = np.load(npz_path, encoding='latin1', allow_pickle=True)
@@ -234,7 +244,7 @@ def data_convert_to_absolute(npz_path, svg_type):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--file', '-f', type=str, default='', help="define a npz path")
+    parser.add_argument('--file', '-f', type=str, default='output_vector.npz', help="define a npz path")
     parser.add_argument('--svg_type', '-st', type=str, choices=['single', 'cluster'], default='single',
                         help="svg type")
     args = parser.parse_args()

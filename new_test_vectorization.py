@@ -12,6 +12,7 @@ from model_common_test import DiffPastingV3, VirtualSketchingModel
 from utils import reset_graph, load_checkpoint, update_hyperparams, draw, \
     save_seq_data, image_pasting_v3_testing, draw_strokes
 from dataset_utils import load_dataset_testing
+from tools.svg_conversion import data_convert_to_absolute
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
@@ -405,17 +406,17 @@ def main_testing(test_image_base_dir, test_dataset, test_image_raw_name,
             # print(out_log)
 
         # print('Saving results ...')
-        save_seq_data(sampling_dir, test_image_raw_name,
+        save_npz_path = save_seq_data(sampling_dir, test_image_raw_name,
                       strokes_raw_out, multi_cursors,
                       test_image_size, round_new_lengths, eval_hps_model.min_width)
-
-        draw_strokes(strokes_raw_out, sampling_dir, test_image_raw_name + '_pred.png',
-                     ori_img, test_image_size,
-                     multi_cursors, round_new_lengths, eval_hps_model.min_width, eval_hps_model.cursor_type,
-                     sample_hps_model.raster_size, sample_hps_model.min_window_size,
-                     sess,
-                     pasting_func=paste_v3_func,
-                     save_seq=draw_seq, draw_order=draw_order)
+        data_convert_to_absolute(save_npz_path, 'single')
+        # draw_strokes(strokes_raw_out, sampling_dir, test_image_raw_name + '_pred.png',
+        #              ori_img, test_image_size,
+        #              multi_cursors, round_new_lengths, eval_hps_model.min_width, eval_hps_model.cursor_type,
+        #              sample_hps_model.raster_size, sample_hps_model.min_window_size,
+        #              sess,
+        #              pasting_func=paste_v3_func,
+        #              save_seq=draw_seq, draw_order=draw_order)
 
     # average_stroke_number = np.mean(stroke_number_list)
     # average_compute_time = np.mean(compute_time_list)
