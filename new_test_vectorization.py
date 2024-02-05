@@ -465,7 +465,6 @@ if __name__ == '__main__':
     parser.add_argument('--sample', '-s', type=int, default=1, help="The number of outputs.")
     args = parser.parse_args()
 
-    assert args.input != ''
     assert args.sample > 0
 
     main(args.model, args.input, args.sample)
