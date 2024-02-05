@@ -409,7 +409,7 @@ def main_testing(test_image_base_dir, test_dataset, test_image_raw_name,
         save_npz_path = save_seq_data(sampling_dir, test_image_raw_name,
                       strokes_raw_out, multi_cursors,
                       test_image_size, round_new_lengths, eval_hps_model.min_width)
-        data_convert_to_absolute(save_npz_path, 'single')
+        data_convert_to_absolute(save_npz_path, 'single', test_image_raw_name)
         # draw_strokes(strokes_raw_out, sampling_dir, test_image_raw_name + '_pred.png',
         #              ori_img, test_image_size,
         #              multi_cursors, round_new_lengths, eval_hps_model.min_width, eval_hps_model.cursor_type,

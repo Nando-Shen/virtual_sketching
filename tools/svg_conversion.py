@@ -203,7 +203,7 @@ def convert_strokes_to_svg(data, init_cursor, image_size, infer_lengths, init_wi
         raise Exception('Unknown svg_type', svg_type)
 
 
-def data_convert_to_absolute(npz_path, svg_type):
+def data_convert_to_absolute(npz_path, svg_type, filename):
     assert npz_path != ''
     assert svg_type in ['single', 'cluster']
 
@@ -235,7 +235,7 @@ def data_convert_to_absolute(npz_path, svg_type):
     else:
         round_lengths = round_length
 
-    save_path = os.path.join(svg_data_base, str(svg_type) + '.svg')
+    save_path = os.path.join(svg_data_base, str(filename)[:-4] + '.svg')
 
     convert_strokes_to_svg(strokes_data, init_cursors, image_size, round_lengths, init_width,
                            min_window_size=min_window_size, raster_size=raster_size, save_path=save_path,
