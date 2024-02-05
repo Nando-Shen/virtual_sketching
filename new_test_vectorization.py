@@ -450,7 +450,7 @@ def main(model_name, test_image_name, sampling_num):
                 continue
             if not file.__contains__('frame'):
                 continue
-            new_root = root.replace('test_2k_540p', 'test_2k_vslabel')
+            new_root = root.replace('test_2k_540p', 'test_2k_label/test_2k_label')
             main_testing(root, test_dataset, file,
                          new_root, model_base_dir, model_name, sampling_num,
                          draw_seq=draw_seq, draw_order=draw_color_order,
