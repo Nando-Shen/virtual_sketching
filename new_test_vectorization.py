@@ -444,13 +444,13 @@ def main(model_name, test_image_name, sampling_num):
     # set numpy output to something sensible
     np.set_printoptions(precision=8, edgeitems=6, linewidth=200, suppress=True)
 
-    for root, dirs, files in os.walk("/share/kuhu6123/atd12k_points/atd12k_points/test_2k_540p"):
+    for root, dirs, files in os.walk("/home/kuhu6123/jshe2377/AnimeRun/AnimeRun/test/contourcopy"):
         for file in files:
             if file == '.DS_Store':
                 continue
             if not file.__contains__('frame'):
                 continue
-            new_root = root.replace('test_2k_540p', 'test_2k_label/test_2k_label')
+            new_root = root.replace('test/contourcopy', 'test/contour_json')
             main_testing(root, test_dataset, file,
                          new_root, model_base_dir, model_name, sampling_num,
                          draw_seq=draw_seq, draw_order=draw_color_order,
