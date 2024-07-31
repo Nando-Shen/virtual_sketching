@@ -461,7 +461,7 @@ def main(model_name, test_image_name, sampling_num):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', '-i', type=str, default='', help="The test image name.")
-    parser.add_argument('--model', '-m', type=str, default='pretrain_clean_line_drawings', help="The trained model.")
+    parser.add_argument('--model', '-m', type=str, default='/home/kuhu6123/jshe2377/virtual_sketching/outputs/snapshot/pretrain_clean_line_drawings', help="The trained model.")
     parser.add_argument('--sample', '-s', type=int, default=1, help="The number of outputs.")
     args = parser.parse_args()
 
