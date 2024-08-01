@@ -84,15 +84,15 @@ class VirtualSketchingModel(object):
         self.hps = hps
         assert hps.model_mode in ['train', 'eval', 'eval_sample', 'sample']
         # with tf.variable_scope('SCC', reuse=reuse):
-        if not gpu_mode:
-            with tf.device('/cpu:0'):
-                print('Model using cpu.')
-                self.build_model()
-        else:
-            print('-' * 100)
-            print('model_mode:', hps.model_mode)
-            print('Model using gpu.')
+        # if not gpu_mode:
+        with tf.device('/cpu:0'):
+            print('Model using cpu.')
             self.build_model()
+        # else:
+        #     print('-' * 100)
+        #     print('model_mode:', hps.model_mode)
+        #     print('Model using gpu.')
+        #     self.build_model()
 
     def build_model(self):
         """Define model architecture."""
