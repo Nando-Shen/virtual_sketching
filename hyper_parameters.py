@@ -51,7 +51,7 @@ def get_default_hparams_clean():
 
         max_seq_len=48,
         batch_size=20,
-        gpus=[0, 1],
+        gpus=[1],
         loop_per_gpu=1,
 
         sn_loss_type='increasing',  # ['decreasing', 'fixed', 'increasing']
