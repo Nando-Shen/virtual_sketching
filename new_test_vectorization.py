@@ -14,7 +14,7 @@ from utils import reset_graph, load_checkpoint, update_hyperparams, draw, \
 from dataset_utils import load_dataset_testing
 from tools.svg_conversion import data_convert_to_absolute
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 
 def move_cursor_to_undrawn(current_canvas_list, input_image_, last_min_acc_list, grid_patch_size=128,
