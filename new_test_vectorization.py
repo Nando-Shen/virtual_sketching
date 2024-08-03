@@ -444,7 +444,7 @@ def main(model_name, test_image_name, sampling_num):
     # set numpy output to something sensible
     np.set_printoptions(precision=8, edgeitems=6, linewidth=200, suppress=True)
 
-    for root, dirs, files in os.walk("/home/kuhu6123/jshe2377/AnimeRun/AnimeRun/test/contourcopy"):
+    for root, dirs, files in os.walk("/home/kuhu6123/jshe2377/AnimeRun/test/contourcopy"):
         for file in files:
             if file == '.DS_Store':
                 continue
